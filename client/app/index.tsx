@@ -1,12 +1,27 @@
 import { StyleSheet, View, Text, ActivityIndicator } from 'react-native';
 import { SafeAreaView, ScrollView, TouchableOpacity } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { Audio } from "expo-av";
 
 export default function HomeScreen() {
   const [transcribedSpeech, setTranscribedSpech] = useState("");
   const [isRecording, setIsRecording] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
+  const audioRecordingRef = useRef(new Audio.Recording())
+
+  const startRecording = () => {
+    setIsRecording(true);
+    //record the speech
+  };
+
+  const stopRecording = async () => {
+    setIsRecording(false);
+    setIsTranscribing(true);
+    //transcribe  recorded speech
+    setIsTranscribing(false);
+  };
+
   return (
     <div>
       <SafeAreaView>
@@ -27,7 +42,13 @@ export default function HomeScreen() {
               )}
               
             </View>
-            <TouchableOpacity style={styles.microphoneButton}>
+            <TouchableOpacity style={{...styles.microphoneButton, opacity: isRecording
+              || isTranscribing ? 0.5 : 1
+            }}
+            onPressIn={()=>{}}
+            onPressOut={()=>{}}
+            disabled={isRecording || isTranscribing}
+            >
               {isRecording ? (
                 <ActivityIndicator size="small" color="white" />
               ) : (
