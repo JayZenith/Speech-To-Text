@@ -1,6 +1,6 @@
 import { StyleSheet, View, Text } from 'react-native';
-import { SafeAreaView, ScrollView } from 'react-native';
-
+import { SafeAreaView, ScrollView, TouchableOpacity } from 'react-native';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 export default function HomeScreen() {
   return (
@@ -12,6 +12,9 @@ export default function HomeScreen() {
             <View style={styles.transcriptionContainer}>
               <Text>Transcribed text shown here.</Text>
             </View>
+            <TouchableOpacity style={styles.microphoneButton}>
+              <FontAwesome name="microphone" size={45} color="black" />
+            </TouchableOpacity>
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -48,6 +51,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-start",
     justifyContent: "flex-start",
-  }
+  },
+  microphoneButton:{
+    backgroundColor:"red",
+    width: 75,
+    height: 75,
+    marginTop: 100,
+    borderRadius: 50,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   
 });
