@@ -9,6 +9,9 @@ export default function HomeScreen() {
         <ScrollView style={styles.mainScrollContainer}>
           <View style={styles.mainInnterContainer}>
             <Text style={styles.title}>Welcome to Speech to Text App</Text>
+            <View style={styles.transcriptionContainer}>
+              <Text>Transcribed text shown here.</Text>
+            </View>
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -35,5 +38,16 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 20,
   },
+  transcriptionContainer:{
+    backgroundColor: "rgb(220, 220, 220)",
+    width: "100%",
+    height: 300, 
+    padding: 20,
+    marginBottom: 20,
+    borderRadius: 5,
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "flex-start",
+  }
   
 });
