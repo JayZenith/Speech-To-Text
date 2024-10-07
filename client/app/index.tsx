@@ -1,8 +1,12 @@
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, ActivityIndicator } from 'react-native';
 import { SafeAreaView, ScrollView, TouchableOpacity } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { useState } from 'react';
 
 export default function HomeScreen() {
+  const [transcribedSpeech, setTranscribedSpech] = useState("");
+  const [isRecording, setIsRecording] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
   return (
     <div>
       <SafeAreaView>
@@ -10,10 +14,26 @@ export default function HomeScreen() {
           <View style={styles.mainInnterContainer}>
             <Text style={styles.title}>Welcome to Speech to Text App</Text>
             <View style={styles.transcriptionContainer}>
-              <Text>Transcribed text shown here.</Text>
+              {isTranscribing ? (
+                <ActivityIndicator size="small" color="#000" />
+               ) : (
+               <Text 
+                style={{
+                  ...styles.transcribedText, 
+                  color: transcribedSpeech ? "#000" : "rgb(150,150,150)",
+                }}>
+                {transcribedSpeech || "Transcribed text shown here."}
+              </Text>
+              )}
+              
             </View>
             <TouchableOpacity style={styles.microphoneButton}>
-              <FontAwesome name="microphone" size={45} color="black" />
+              {isRecording ? (
+                <ActivityIndicator size="small" color="white" />
+              ) : (
+                <FontAwesome name="microphone" size={45} color="white" />
+              )}
+              
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -52,6 +72,14 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     justifyContent: "flex-start",
   },
+  transcribedText: {
+    width: "100%",
+    fontSize: 20,
+    padding: 5, 
+    color: "#000",
+    textAlign: "left",
+
+  },
   microphoneButton:{
     backgroundColor:"red",
     width: 75,
@@ -61,5 +89,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+
   
 });
