@@ -3,6 +3,8 @@ import { SafeAreaView, ScrollView, TouchableOpacity } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useRef, useState } from 'react';
 import { Audio } from "expo-av";
+import { recordSpeech } from '@/functions/recordSpeech';
+import { transcribeSpeech } from '@/functions/transcribeSpeech';
 
 export default function HomeScreen() {
   const [transcribedSpeech, setTranscribedSpech] = useState("");
@@ -10,15 +12,25 @@ export default function HomeScreen() {
   const [isTranscribing, setIsTranscribing] = useState(false);
   const audioRecordingRef = useRef(new Audio.Recording())
 
-  const startRecording = () => {
+  const startRecording = async () => {
     setIsRecording(true);
-    //record the speech
+    await recordSpeech(audioRecordingRef);
   };
 
   const stopRecording = async () => {
     setIsRecording(false);
     setIsTranscribing(true);
-    //transcribe  recorded speech
+    
+    try{
+      const speechTranscript = await transcribeSpeech(audioRecordingRef);
+      setTranscribedSpech(speechTranscript || "");
+
+    }catch(e){
+      console.error(e);
+    } finally {
+      setIsTranscribing(false);
+    }
+
     setIsTranscribing(false);
   };
 
@@ -45,8 +57,8 @@ export default function HomeScreen() {
             <TouchableOpacity style={{...styles.microphoneButton, opacity: isRecording
               || isTranscribing ? 0.5 : 1
             }}
-            onPressIn={()=>{}}
-            onPressOut={()=>{}}
+            onPressIn={startRecording}
+            onPressOut={stopRecording}
             disabled={isRecording || isTranscribing}
             >
               {isRecording ? (
