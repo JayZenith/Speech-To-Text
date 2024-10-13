@@ -1,91 +1,121 @@
-import { StyleSheet, View, Text, ActivityIndicator } from 'react-native';
-import { SafeAreaView, ScrollView, TouchableOpacity } from 'react-native';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from "react";
+import {
+  StyleSheet,
+  Text,
+  SafeAreaView,
+  ScrollView,
+  View,
+  ActivityIndicator,
+  TouchableOpacity,
+} from "react-native";
 import { Audio } from "expo-av";
-import { recordSpeech } from '@/functions/recordSpeech';
-import { transcribeSpeech } from '@/functions/transcribeSpeech';
+import { transcribeSpeech } from "@/functions/transcribeSpeech";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { recordSpeech } from "@/functions/recordSpeech";
+import useWebFocus from "@/hooks/useWebFocus";
 
 export default function HomeScreen() {
-  const [transcribedSpeech, setTranscribedSpech] = useState("");
+  const [transcribedSpeech, setTranscribedSpeech] = useState("");
   const [isRecording, setIsRecording] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
-  const audioRecordingRef = useRef(new Audio.Recording())
+  const isWebFocused = useWebFocus();
+  const audioRecordingRef = useRef(new Audio.Recording());
+  const webAudioPermissionsRef = useRef<MediaStream | null>(null);
+
+  useEffect(() => {
+    if (isWebFocused) {
+      const getMicAccess = async () => {
+        const permissions = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+        });
+        webAudioPermissionsRef.current = permissions;
+      };
+      if (!webAudioPermissionsRef.current) getMicAccess();
+    } else {
+      if (webAudioPermissionsRef.current) {
+        webAudioPermissionsRef.current
+          .getTracks()
+          .forEach((track) => track.stop());
+        webAudioPermissionsRef.current = null;
+      }
+    }
+  }, [isWebFocused]);
 
   const startRecording = async () => {
     setIsRecording(true);
-    await recordSpeech(audioRecordingRef);
+    await recordSpeech(
+      audioRecordingRef,
+      setIsRecording,
+      !!webAudioPermissionsRef.current
+    );
   };
 
   const stopRecording = async () => {
     setIsRecording(false);
     setIsTranscribing(true);
-    
-    try{
+    try {
       const speechTranscript = await transcribeSpeech(audioRecordingRef);
-      setTranscribedSpech(speechTranscript || "");
-
-    }catch(e){
+      setTranscribedSpeech(speechTranscript || "");
+    } catch (e) {
       console.error(e);
     } finally {
       setIsTranscribing(false);
     }
-
-    setIsTranscribing(false);
   };
 
   return (
-    <div>
-      <SafeAreaView>
-        <ScrollView style={styles.mainScrollContainer}>
-          <View style={styles.mainInnterContainer}>
-            <Text style={styles.title}>Welcome to Speech to Text App</Text>
-            <View style={styles.transcriptionContainer}>
-              {isTranscribing ? (
-                <ActivityIndicator size="small" color="#000" />
-               ) : (
-               <Text 
+    <SafeAreaView>
+      <ScrollView style={styles.mainScrollContainer}>
+        <View style={styles.mainInnerContainer}>
+          <Text style={styles.title}>Welcome to the Speech-to-Text App</Text>
+          <View style={styles.transcriptionContainer}>
+            {isTranscribing ? (
+              <ActivityIndicator size="small" color="#000" />
+            ) : (
+              <Text
                 style={{
-                  ...styles.transcribedText, 
+                  ...styles.transcribedText,
                   color: transcribedSpeech ? "#000" : "rgb(150,150,150)",
-                }}>
-                {transcribedSpeech || "Transcribed text shown here."}
+                }}
+              >
+                {transcribedSpeech ||
+                  "Your transcribed text will be shown here"}
               </Text>
-              )}
-              
-            </View>
-            <TouchableOpacity style={{...styles.microphoneButton, opacity: isRecording
-              || isTranscribing ? 0.5 : 1
+            )}
+          </View>
+          <TouchableOpacity
+            style={{
+              ...styles.microphoneButton,
+              opacity: isRecording || isTranscribing ? 0.5 : 1,
             }}
             onPressIn={startRecording}
             onPressOut={stopRecording}
             disabled={isRecording || isTranscribing}
-            >
-              {isRecording ? (
-                <ActivityIndicator size="small" color="white" />
-              ) : (
-                <FontAwesome name="microphone" size={45} color="white" />
-              )}
-              
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-      </SafeAreaView>
-    </div>
+          >
+            {isRecording ? (
+              <ActivityIndicator size="small" color="white" />
+            ) : (
+              <FontAwesome name="microphone" size={40} color="white" />
+            )}
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  mainScrollContainer:{
+  mainScrollContainer: {
+    padding: 20,
     height: "100%",
     width: "100%",
-    padding: 20,
   },
-
-  mainInnterContainer: {
+  mainInnerContainer: {
+    gap: 75,
     height: "100%",
-    alignItems: "center", 
+    alignItems: "center",
     justifyContent: "center",
+    flexGrow: 1,
   },
   title: {
     fontSize: 35,
@@ -94,10 +124,10 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 20,
   },
-  transcriptionContainer:{
-    backgroundColor: "rgb(220, 220, 220)",
+  transcriptionContainer: {
+    backgroundColor: "rgb(220,220,220)",
     width: "100%",
-    height: 300, 
+    height: 300,
     padding: 20,
     marginBottom: 20,
     borderRadius: 5,
@@ -106,15 +136,14 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
   },
   transcribedText: {
-    width: "100%",
     fontSize: 20,
-    padding: 5, 
+    padding: 5,
     color: "#000",
     textAlign: "left",
-
+    width: "100%",
   },
-  microphoneButton:{
-    backgroundColor:"red",
+  microphoneButton: {
+    backgroundColor: "red",
     width: 75,
     height: 75,
     marginTop: 100,
@@ -122,6 +151,4 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-
-  
 });
