@@ -67,7 +67,7 @@ export default function HomeScreen() {
     <SafeAreaView>
       <ScrollView style={styles.mainScrollContainer}>
         <View style={styles.mainInnerContainer}>
-          <Text style={styles.title}>Welcome to the Speech-to-Text App</Text>
+          <Text style={styles.title}>Speech to Text</Text>
           <View style={styles.transcriptionContainer}>
             {isTranscribing ? (
               <ActivityIndicator size="small" color="#000" />
@@ -75,7 +75,7 @@ export default function HomeScreen() {
               <Text
                 style={{
                   ...styles.transcribedText,
-                  color: transcribedSpeech ? "#000" : "rgb(150,150,150)",
+                  color: transcribedSpeech ? "#000" : "black",
                 }}
               >
                 {transcribedSpeech ||
@@ -109,6 +109,7 @@ const styles = StyleSheet.create({
     padding: 20,
     height: "100%",
     width: "100%",
+
   },
   mainInnerContainer: {
     gap: 75,
