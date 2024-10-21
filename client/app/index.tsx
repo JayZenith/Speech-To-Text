@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   transcriptionContainer: {
-    backgroundColor: "rgb(220,220,220)",
+    backgroundColor: "rgb(210,210,210)",
     width: "100%",
     height: 300,
     padding: 20,
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   microphoneButton: {
-    backgroundColor: "red",
+    backgroundColor: "green",
     width: 75,
     height: 75,
     marginTop: 100,
